@@ -6,14 +6,34 @@
     <meta name="description" content="Compare before and after photos of your home renovation with a slider." />
     <meta name="theme-color" content="#f5efe6" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1b1815" media="(prefers-color-scheme: dark)" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Then & Now" />
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <title>Then &amp; Now</title>
+    <!-- Inline so the page is never a blank white screen, even before the app's CSS/JS load. -->
+    <style>
+      body { margin: 0; background: #f5efe6; color: #2b2521; font-family: system-ui, sans-serif; }
+      @media (prefers-color-scheme: dark) { body { background: #1b1815; color: #f3ece3; } }
+      .boot { padding: 48px 24px; text-align: center; opacity: 0.7; }
+      .boot-error { max-width: 36rem; margin: 24px auto; padding: 16px; border-radius: 10px;
+        background: #fbe3e1; color: #7a1c16; font: 14px/1.5 ui-monospace, monospace; text-align: left;
+        white-space: pre-wrap; word-break: break-word; }
+    </style>
+    <script>
+      // Show start-up errors on screen, since phones have no developer console.
+      window.addEventListener('error', function (e) {
+        var root = document.getElementById('root');
+        if (!root || root.querySelector('main')) return;
+        var box = document.createElement('div');
+        box.className = 'boot-error';
+        box.textContent = 'Sorry, the app failed to start:\n' + (e.message || (e.target && e.target.src) || 'unknown error');
+        root.appendChild(box);
+      }, true);
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><p class="boot">Loading Then &amp; Now…</p></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
