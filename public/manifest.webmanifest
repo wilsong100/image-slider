@@ -1,0 +1,11 @@
+{
+  "name": "Then & Now",
+  "short_name": "Then & Now",
+  "description": "Compare before and after photos of your home renovation.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5efe6",
+  "theme_color": "#c2603a",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

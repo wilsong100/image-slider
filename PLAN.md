@@ -69,21 +69,24 @@ type StoredImage = { id: string; blob: Blob; width: number; height: number; thum
 ## 4. Build milestones
 
 ### Milestone 1 — MVP (the slider)
-- [ ] Scaffold Vite + React + TS, lint/format, CI build
-- [ ] `<CompareSlider before after />` component (drag, touch, keyboard, a11y)
-- [ ] Upload screen: choose/drag-drop two photos, preview, save
-- [ ] Image preprocessing: honour EXIF orientation, downscale to ~2560px, JPEG/WebP
-- [ ] Save to IndexedDB; gallery list with thumbnails; delete/edit
-- [ ] Deploy to GitHub Pages
+- [x] Scaffold Vite + React + TS, lint/format, CI build
+- [x] `<CompareSlider before after />` component (drag, touch, keyboard, a11y)
+- [x] Upload screen: choose/drag-drop two photos, preview, save
+- [x] Image preprocessing: honour EXIF orientation, downscale to ~2560px, JPEG/WebP
+- [x] Save to IndexedDB; gallery list with thumbnails; delete/edit
+- [x] Deploy to GitHub Pages (workflow ready — enable Pages in repo settings)
 
 ### Milestone 2 — Make it great
-- [ ] Rooms/groups and a room-by-room gallery
+- [x] Rooms/groups and a room-by-room gallery
 - [ ] Full-screen viewer with swipe between comparisons
 - [ ] **Alignment editor** – nudge/zoom/rotate the after photo with a 50% opacity
       "onion skin" so both shots line up (see suggestions)
 - [ ] Alternate view modes: vertical slider, side-by-side, fade/opacity, tap-to-toggle
 - [ ] Notes, dates, costs per comparison
 - [ ] Export/import a backup (zip of photos + JSON) so nothing is lost
+
+### Later
+- [ ] **Projects** – group comparisons by house, so several properties can live in one app
 
 ### Milestone 3 — Share & show off
 - [ ] Cloud sync + public read-only share links
@@ -114,11 +117,11 @@ type StoredImage = { id: string; blob: Blob; width: number; height: number; thum
 
 ---
 
-## 6. Open questions
+## 6. Decisions
 
-- Who will view it — just you, or family/friends too? (Decides whether we need cloud
-  storage in v1.)
-- Mainly phone, desktop, or both?
-- Roughly how many photo pairs? (Affects storage strategy; browsers usually allow
-  hundreds of MB to several GB in IndexedDB.)
-- Any preferred look/branding (e.g. the house's name, colour scheme)?
+- Private, single user for now → local IndexedDB storage; cloud sync later.
+- Phone and desktop → responsive layout, touch + mouse + keyboard.
+- ~7–10 pairs → comfortably fits in browser storage.
+- Projects (multiple houses) → later improvement.
+- Look: "Linen & Terracotta" — warm linen background, terracotta accent, stone grey for
+  "before", Fraunces headings with Inter body text, automatic dark mode.
