@@ -32,6 +32,7 @@ describe('parseRoute', () => {
     expect(parseRoute('')).toEqual({ name: 'gallery' });
     expect(parseRoute('#/')).toEqual({ name: 'gallery' });
     expect(parseRoute('#/new')).toEqual({ name: 'new' });
+    expect(parseRoute('#/backup')).toEqual({ name: 'backup' });
     expect(parseRoute('#/c/abc')).toEqual({ name: 'view', id: 'abc' });
     expect(parseRoute('#/c/abc/edit')).toEqual({ name: 'edit', id: 'abc' });
     expect(parseRoute('#/nonsense')).toEqual({ name: 'gallery' });

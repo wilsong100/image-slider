@@ -3,12 +3,14 @@ import { useEffect, useState } from 'react';
 export type Route =
   | { name: 'gallery' }
   | { name: 'new' }
+  | { name: 'backup' }
   | { name: 'view'; id: string }
   | { name: 'edit'; id: string };
 
 export function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   if (parts[0] === 'new') return { name: 'new' };
+  if (parts[0] === 'backup') return { name: 'backup' };
   if (parts[0] === 'c' && parts[1]) {
     return parts[2] === 'edit' ? { name: 'edit', id: parts[1] } : { name: 'view', id: parts[1] };
   }
@@ -18,6 +20,7 @@ export function parseRoute(hash: string): Route {
 export const href = {
   gallery: () => '#/',
   new: () => '#/new',
+  backup: () => '#/backup',
   view: (id: string) => `#/c/${encodeURIComponent(id)}`,
   edit: (id: string) => `#/c/${encodeURIComponent(id)}/edit`,
 };

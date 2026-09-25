@@ -83,7 +83,7 @@ type StoredImage = { id: string; blob: Blob; width: number; height: number; thum
       "onion skin" so both shots line up (see suggestions)
 - [ ] Alternate view modes: vertical slider, side-by-side, fade/opacity, tap-to-toggle
 - [ ] Notes, dates, costs per comparison
-- [ ] Export/import a backup (zip of photos + JSON) so nothing is lost
+- [x] Export/import a backup (zip of photos + JSON) so nothing is lost — also the migration path into cloud sync later
 
 ### Later
 - [ ] **Projects** – group comparisons by house, so several properties can live in one app
