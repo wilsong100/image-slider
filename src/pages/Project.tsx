@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PhotoLayers } from '../components/PhotoLayers';
 import { getProject, listComparisons } from '../lib/db';
+import { formatMonthYear } from '../lib/dates';
 import { useImage, useImageUrl } from '../lib/hooks';
 import { href, navigate } from '../lib/router';
 import type { Comparison, Project as ProjectType } from '../lib/types';
@@ -36,6 +37,11 @@ function Card({ comparison }: { comparison: Comparison }) {
       <SplitPreview comparison={comparison} />
       <div className="card__body">
         <h3 className="card__title">{comparison.title || 'Untitled'}</h3>
+        {(comparison.beforeDate || comparison.afterDate) && (
+          <p className="card__meta">
+            {formatMonthYear(comparison.beforeDate) || '?'} → {formatMonthYear(comparison.afterDate) || '?'}
+          </p>
+        )}
         {comparison.notes && <p className="card__notes">{comparison.notes}</p>}
       </div>
     </a>

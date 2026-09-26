@@ -17,6 +17,9 @@ export type Comparison = {
   afterImageId: string;
   /** How the after photo is moved/zoomed/rotated to line up with the before photo. */
   alignment?: Alignment;
+  /** When each photo was taken, "YYYY-MM-DD" (read from the photo, editable). */
+  beforeDate?: string;
+  afterDate?: string;
   createdAt: number;
   updatedAt: number;
 };
