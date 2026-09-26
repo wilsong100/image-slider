@@ -8,7 +8,11 @@ type Props = {
   /** width / height of the frame; defaults to 4:3 until images load. */
   aspectRatio?: number;
   initial?: number;
+  /** Set to drive the handle from outside (e.g. tour mode); dragging is then disabled. */
+  position?: number;
   alignment?: Alignment;
+  beforeLabel?: string;
+  afterLabel?: string;
   className?: string;
 };
 
@@ -18,10 +22,22 @@ export const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.m
  * Stacks two photos in the same frame. The "before" photo sits on top and is
  * clipped to the left of the handle, so dragging right reveals more "before".
  */
-export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initial = 50, alignment, className }: Props) {
+export function CompareSlider({
+  beforeSrc,
+  afterSrc,
+  aspectRatio = 4 / 3,
+  initial = 50,
+  position: controlled,
+  alignment,
+  beforeLabel = 'Before',
+  afterLabel = 'After',
+  className,
+}: Props) {
   const frameRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState(initial);
+  const [internal, setPosition] = useState(initial);
   const [dragging, setDragging] = useState(false);
+  const isControlled = controlled !== undefined;
+  const position = controlled ?? internal;
 
   const moveTo = useCallback((clientX: number) => {
     const rect = frameRef.current?.getBoundingClientRect();
@@ -30,7 +46,7 @@ export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initia
   }, []);
 
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || isControlled) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     setDragging(true);
     moveTo(e.clientX);
@@ -41,6 +57,7 @@ export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initia
   const stop = () => setDragging(false);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (isControlled) return;
     const step = e.shiftKey ? 10 : 2;
     const next: Record<string, number> = {
       ArrowLeft: position - step,
@@ -61,7 +78,7 @@ export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initia
   return (
     <div
       ref={frameRef}
-      className={`compare ${dragging ? 'is-dragging' : ''} ${className ?? ''}`}
+      className={`compare ${dragging ? 'is-dragging' : ''} ${isControlled ? 'is-controlled' : ''} ${className ?? ''}`}
       style={{ aspectRatio: String(aspectRatio), ['--pos' as string]: `${position}%` }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -69,11 +86,11 @@ export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initia
       onPointerCancel={stop}
     >
       <PhotoLayers beforeSrc={beforeSrc} afterSrc={afterSrc} aspect={aspectRatio} alignment={alignment} />
-      <span className="compare__label compare__label--before" data-hidden={position < 12}>
-        Before
+      <span className="compare__label compare__label--before" data-hidden={position < 20}>
+        {beforeLabel}
       </span>
-      <span className="compare__label compare__label--after" data-hidden={position > 88}>
-        After
+      <span className="compare__label compare__label--after" data-hidden={position > 80}>
+        {afterLabel}
       </span>
       <div className="compare__divider" aria-hidden="true" />
       <div

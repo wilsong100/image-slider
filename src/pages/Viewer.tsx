@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CompareSlider } from '../components/CompareSlider';
 import { deleteComparison, getImage, getProject, listComparisons } from '../lib/db';
+import { formatDay, formatMonthYear, timeBetween } from '../lib/dates';
 import { useImageUrl } from '../lib/hooks';
 import { href, navigate } from '../lib/router';
 import type { Comparison, Project } from '../lib/types';
@@ -77,6 +78,9 @@ export function Viewer({ id }: { id: string }) {
           <a className="btn btn--ghost" href={href.align(comparison.id)}>
             Line up
           </a>
+          <a className="btn btn--ghost" href={href.export(comparison.id)}>
+            Export
+          </a>
           <a className="btn btn--ghost" href={href.edit(comparison.id)}>
             Edit
           </a>
@@ -93,8 +97,20 @@ export function Viewer({ id }: { id: string }) {
           afterSrc={after}
           aspectRatio={ratio}
           alignment={comparison.alignment}
+          beforeLabel={['Before', formatMonthYear(comparison.beforeDate)].filter(Boolean).join(' · ')}
+          afterLabel={['After', formatMonthYear(comparison.afterDate)].filter(Boolean).join(' · ')}
         />
       </div>
+      {(comparison.beforeDate || comparison.afterDate) && (
+        <p className="viewer__dates">
+          <span>{formatDay(comparison.beforeDate) || 'Unknown date'}</span>
+          <span aria-hidden="true">→</span>
+          <span>{formatDay(comparison.afterDate) || 'Unknown date'}</span>
+          {timeBetween(comparison.beforeDate, comparison.afterDate) && (
+            <strong>{timeBetween(comparison.beforeDate, comparison.afterDate)}</strong>
+          )}
+        </p>
+      )}
       <p className="hint viewer__hint">Drag the handle, or use the arrow keys once it’s selected.</p>
 
       {comparison.notes && <p className="viewer__notes">{comparison.notes}</p>}
