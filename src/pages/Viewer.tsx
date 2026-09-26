@@ -78,6 +78,9 @@ export function Viewer({ id }: { id: string }) {
           <a className="btn btn--ghost" href={href.align(comparison.id)}>
             Line up
           </a>
+          <a className="btn btn--ghost" href={href.export(comparison.id)}>
+            Export
+          </a>
           <a className="btn btn--ghost" href={href.edit(comparison.id)}>
             Edit
           </a>

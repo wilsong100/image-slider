@@ -10,6 +10,12 @@ the same spot, then drag the handle to wipe between them.
 - Comparisons are grouped by room. Works on desktop and phone, in light and dark mode.
 - **Line up photos** ("Line up" on a comparison): drag, pinch/zoom and rotate a see-through after
   photo over the before photo; edges are trimmed automatically so the slide looks seamless.
+- **Photo dates**: read from each photo when added (editable) and shown on the slider, e.g.
+  "Before · Mar 2025", with the time between the two photos.
+- **Tour mode** ("▶ Tour" on a project): a full-screen slideshow that sweeps each comparison from
+  before to after, room by room. Space pauses, arrow keys skip, Esc exits.
+- **Export** ("Export" on a comparison): a looping video (MP4 where supported) or GIF of the slider
+  sweeping across, in photo shape, square or 4:5, with optional title and dates. Download or share.
 - **Backup & restore** (top-right "Backup"): download everything as one .zip, or load a backup on
   another device. The gallery reminds you when there are changes that aren’t backed up yet.
 

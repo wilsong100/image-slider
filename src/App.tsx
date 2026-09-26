@@ -1,6 +1,7 @@
 import { Align } from './pages/Align';
 import { Backup } from './pages/Backup';
 import { Editor } from './pages/Editor';
+import { Export } from './pages/Export';
 import { Project } from './pages/Project';
 import { ProjectForm } from './pages/ProjectForm';
 import { Projects } from './pages/Projects';
@@ -39,6 +40,7 @@ export function App() {
         {route.name === 'backup' && <Backup />}
         {route.name === 'align' && <Align key={route.id} id={route.id} />}
         {route.name === 'view' && <Viewer key={route.id} id={route.id} />}
+        {route.name === 'export' && <Export key={route.id} id={route.id} />}
       </main>
     </>
   );
