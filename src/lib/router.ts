@@ -6,6 +6,7 @@ export type Route =
   | { name: 'project'; id: string }
   | { name: 'projectEdit'; id: string }
   | { name: 'new'; projectId: string }
+  | { name: 'tour'; projectId: string }
   | { name: 'backup' }
   | { name: 'view'; id: string }
   | { name: 'edit'; id: string }
@@ -18,6 +19,7 @@ export function parseRoute(hash: string): Route {
   if (parts[0] === 'p' && parts[1]) {
     if (parts[2] === 'edit') return { name: 'projectEdit', id: parts[1] };
     if (parts[2] === 'new') return { name: 'new', projectId: parts[1] };
+    if (parts[2] === 'tour') return { name: 'tour', projectId: parts[1] };
     return { name: 'project', id: parts[1] };
   }
   if (parts[0] === 'c' && parts[1]) {
@@ -36,6 +38,7 @@ export const href = {
   project: (id: string) => `#/p/${enc(id)}`,
   projectEdit: (id: string) => `#/p/${enc(id)}/edit`,
   new: (projectId: string) => `#/p/${enc(projectId)}/new`,
+  tour: (projectId: string) => `#/p/${enc(projectId)}/tour`,
   backup: () => '#/backup',
   view: (id: string) => `#/c/${enc(id)}`,
   edit: (id: string) => `#/c/${enc(id)}/edit`,

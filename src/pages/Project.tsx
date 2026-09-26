@@ -4,6 +4,7 @@ import { getProject, listComparisons } from '../lib/db';
 import { formatMonthYear } from '../lib/dates';
 import { useImage, useImageUrl } from '../lib/hooks';
 import { href, navigate } from '../lib/router';
+import { startTour } from './Tour';
 import type { Comparison, Project as ProjectType } from '../lib/types';
 
 export function groupByRoom(items: Comparison[]) {
@@ -77,6 +78,11 @@ export function Project({ id }: { id: string }) {
           <a className="btn btn--ghost" href={href.projectEdit(project.id)}>
             Edit project
           </a>
+          {items.length > 0 && (
+            <button type="button" className="btn btn--ghost" onClick={() => startTour(project.id)}>
+              ▶ Tour
+            </button>
+          )}
           {items.length > 0 && (
             <a className="btn btn--primary" href={href.new(project.id)}>
               + New comparison

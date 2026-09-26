@@ -832,6 +832,150 @@ main {
   }
 }
 
+/* ---------- Tour ---------- */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Room for the progress bar above and the controls below. */
+  padding: 64px 16px 92px;
+  overflow: hidden;
+  background: #0f0d0b;
+  color: #f3ece3;
+}
+.tour.is-idle {
+  cursor: none;
+}
+.tour__stage {
+  /* As large as fits, leaving ~115px under the photo for the caption. */
+  width: min(100%, calc((100vh - 64px - 92px - 115px) * var(--ratio)));
+}
+/* A presentation, not something to drag: just the dividing line. */
+.tour .compare__handle {
+  display: none;
+}
+.tour__slide {
+  animation: tour-in 0.7s ease both;
+}
+.tour__slide .compare {
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+}
+@keyframes tour-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+.tour__caption {
+  margin-top: 18px;
+  text-align: center;
+}
+.tour__room {
+  margin: 0;
+  color: #e2794f;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tour__title {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  line-height: 1.15;
+}
+.tour__dates {
+  margin: 6px 0 0;
+  color: #aea398;
+  font-size: 0.95rem;
+}
+.tour__top {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  color: #aea398;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: opacity 0.4s;
+}
+.tour__count {
+  font-variant-numeric: tabular-nums;
+}
+.tour__progress {
+  position: absolute;
+  top: 44px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  gap: 4px;
+  transition: opacity 0.4s;
+}
+.tour__progress span {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.18);
+}
+.tour__progress span.is-done {
+  background: rgb(255 255 255 / 0.75);
+}
+.tour__progress i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #e2794f;
+}
+.tour__controls {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgb(30 26 23 / 0.8);
+  backdrop-filter: blur(10px);
+  transition: opacity 0.4s;
+}
+.tour__controls button {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  color: #f3ece3;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tour__controls button:hover {
+  background: rgb(255 255 255 / 0.18);
+}
+.tour__controls .tour__play {
+  background: #e2794f;
+  color: #1b1815;
+  font-size: 0.95rem;
+}
+.tour__controls .tour__exit {
+  font-size: 0.9rem;
+}
+.tour.is-idle .tour__controls,
+.tour.is-idle .tour__top {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ---------- Viewer ---------- */
 .viewer__tools {
   display: flex;

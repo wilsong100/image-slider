@@ -4,11 +4,14 @@ import { Editor } from './pages/Editor';
 import { Project } from './pages/Project';
 import { ProjectForm } from './pages/ProjectForm';
 import { Projects } from './pages/Projects';
+import { Tour } from './pages/Tour';
 import { Viewer } from './pages/Viewer';
 import { href, useRoute } from './lib/router';
 
 export function App() {
   const route = useRoute();
+  if (route.name === 'tour') return <Tour key={route.projectId} projectId={route.projectId} />;
+
   return (
     <>
       <header className="topbar">
