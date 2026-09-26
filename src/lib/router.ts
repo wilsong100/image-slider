@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 
 export type Route =
-  | { name: 'gallery' }
-  | { name: 'new' }
+  | { name: 'projects' }
+  | { name: 'projectNew' }
+  | { name: 'project'; id: string }
+  | { name: 'projectEdit'; id: string }
+  | { name: 'new'; projectId: string }
   | { name: 'backup' }
   | { name: 'view'; id: string }
   | { name: 'edit'; id: string }
@@ -10,23 +13,33 @@ export type Route =
 
 export function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
-  if (parts[0] === 'new') return { name: 'new' };
   if (parts[0] === 'backup') return { name: 'backup' };
+  if (parts[0] === 'p' && parts[1] === 'new') return { name: 'projectNew' };
+  if (parts[0] === 'p' && parts[1]) {
+    if (parts[2] === 'edit') return { name: 'projectEdit', id: parts[1] };
+    if (parts[2] === 'new') return { name: 'new', projectId: parts[1] };
+    return { name: 'project', id: parts[1] };
+  }
   if (parts[0] === 'c' && parts[1]) {
     if (parts[2] === 'edit') return { name: 'edit', id: parts[1] };
     if (parts[2] === 'align') return { name: 'align', id: parts[1] };
     return { name: 'view', id: parts[1] };
   }
-  return { name: 'gallery' };
+  return { name: 'projects' };
 }
 
+const enc = encodeURIComponent;
+
 export const href = {
-  gallery: () => '#/',
-  new: () => '#/new',
+  home: () => '#/',
+  projectNew: () => '#/p/new',
+  project: (id: string) => `#/p/${enc(id)}`,
+  projectEdit: (id: string) => `#/p/${enc(id)}/edit`,
+  new: (projectId: string) => `#/p/${enc(projectId)}/new`,
   backup: () => '#/backup',
-  view: (id: string) => `#/c/${encodeURIComponent(id)}`,
-  edit: (id: string) => `#/c/${encodeURIComponent(id)}/edit`,
-  align: (id: string) => `#/c/${encodeURIComponent(id)}/align`,
+  view: (id: string) => `#/c/${enc(id)}`,
+  edit: (id: string) => `#/c/${enc(id)}/edit`,
+  align: (id: string) => `#/c/${enc(id)}/align`,
 };
 
 export function navigate(to: string) {

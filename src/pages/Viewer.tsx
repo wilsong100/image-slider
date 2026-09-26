@@ -1,18 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { CompareSlider } from '../components/CompareSlider';
-import { deleteComparison, getImage, listComparisons } from '../lib/db';
+import { deleteComparison, getImage, getProject, listComparisons } from '../lib/db';
 import { useImageUrl } from '../lib/hooks';
 import { href, navigate } from '../lib/router';
-import type { Comparison } from '../lib/types';
+import type { Comparison, Project } from '../lib/types';
 
 export function Viewer({ id }: { id: string }) {
+  // Comparisons in the same project, for previous/next.
   const [all, setAll] = useState<Comparison[]>();
+  const [project, setProject] = useState<Project>();
   const [ratio, setRatio] = useState<number>();
   const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    listComparisons().then(setAll);
-  }, []);
+    listComparisons().then((list) => {
+      const projectId = list.find((c) => c.id === id)?.projectId;
+      setAll(list.filter((c) => c.projectId === projectId));
+      if (projectId) getProject(projectId).then(setProject);
+    });
+  }, [id]);
 
   const index = all?.findIndex((c) => c.id === id) ?? -1;
   const comparison = all?.[index];
@@ -28,7 +34,7 @@ export function Viewer({ id }: { id: string }) {
   }, [comparison]);
 
   useEffect(() => {
-    if (all && !comparison) navigate(href.gallery());
+    if (all && !comparison) navigate(href.home());
   }, [all, comparison]);
 
   useEffect(() => {
@@ -46,7 +52,7 @@ export function Viewer({ id }: { id: string }) {
   const onDelete = async () => {
     if (!window.confirm(`Delete “${comparison.title}”? This can’t be undone.`)) return;
     await deleteComparison(comparison.id);
-    navigate(href.gallery());
+    navigate(href.project(comparison.projectId));
   };
 
   const toggleFullscreen = () => {
@@ -58,8 +64,8 @@ export function Viewer({ id }: { id: string }) {
     <div className="page viewer">
       <div className="page__head">
         <div>
-          <a className="back" href={href.gallery()}>
-            ← All comparisons
+          <a className="back" href={href.project(comparison.projectId)}>
+            ← {project?.name ?? 'Back'}
           </a>
           {comparison.room && <p className="eyebrow">{comparison.room}</p>}
           <h1 className="display">{comparison.title}</h1>

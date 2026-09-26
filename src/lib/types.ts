@@ -1,5 +1,15 @@
+/** A house (or any renovation project) that groups comparisons. */
+export type Project = {
+  id: string;
+  name: string;
+  notes: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
 export type Comparison = {
   id: string;
+  projectId: string;
   title: string;
   room: string;
   notes: string;

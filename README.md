@@ -5,6 +5,8 @@ the same spot, then drag the handle to wipe between them.
 
 - Photos are stored privately in your browser (IndexedDB) — nothing is uploaded.
 - Photos are rotated correctly, resized to max 2560px, and re-encoded (which also strips GPS data).
+- **Projects**: one per house. Each project has its own comparisons, grouped by room.
+  Comparisons can be moved between projects from their Edit screen.
 - Comparisons are grouped by room. Works on desktop and phone, in light and dark mode.
 - **Line up photos** ("Line up" on a comparison): drag, pinch/zoom and rotate a see-through after
   photo over the before photo; edges are trimmed automatically so the slide looks seamless.
