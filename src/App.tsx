@@ -1,3 +1,4 @@
+import { Align } from './pages/Align';
 import { Backup } from './pages/Backup';
 import { Editor } from './pages/Editor';
 import { Gallery } from './pages/Gallery';
@@ -28,6 +29,7 @@ export function App() {
         {route.name === 'new' && <Editor key="new" />}
         {route.name === 'edit' && <Editor key={route.id} id={route.id} />}
         {route.name === 'backup' && <Backup />}
+        {route.name === 'align' && <Align key={route.id} id={route.id} />}
         {route.name === 'view' && <Viewer key={route.id} id={route.id} />}
       </main>
     </>

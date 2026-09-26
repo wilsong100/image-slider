@@ -68,6 +68,9 @@ export function Viewer({ id }: { id: string }) {
           <button className="btn btn--ghost" type="button" onClick={toggleFullscreen}>
             Full screen
           </button>
+          <a className="btn btn--ghost" href={href.align(comparison.id)}>
+            Line up
+          </a>
           <a className="btn btn--ghost" href={href.edit(comparison.id)}>
             Edit
           </a>
@@ -78,7 +81,13 @@ export function Viewer({ id }: { id: string }) {
       </div>
 
       <div className="viewer__stage" ref={stageRef} style={{ ['--ratio' as string]: ratio ?? 4 / 3 }}>
-        <CompareSlider key={comparison.id} beforeSrc={before} afterSrc={after} aspectRatio={ratio} />
+        <CompareSlider
+          key={comparison.id}
+          beforeSrc={before}
+          afterSrc={after}
+          aspectRatio={ratio}
+          alignment={comparison.alignment}
+        />
       </div>
       <p className="hint viewer__hint">Drag the handle, or use the arrow keys once it’s selected.</p>
 
