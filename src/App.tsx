@@ -1,3 +1,4 @@
+import { Backup } from './pages/Backup';
 import { Editor } from './pages/Editor';
 import { Gallery } from './pages/Gallery';
 import { Viewer } from './pages/Viewer';
@@ -16,11 +17,17 @@ export function App() {
           </svg>
           <span>Then &amp; Now</span>
         </a>
+        <nav className="topbar__nav">
+          <a className={route.name === 'backup' ? 'is-active' : ''} href={href.backup()}>
+            Backup
+          </a>
+        </nav>
       </header>
       <main>
         {route.name === 'gallery' && <Gallery />}
         {route.name === 'new' && <Editor key="new" />}
         {route.name === 'edit' && <Editor key={route.id} id={route.id} />}
+        {route.name === 'backup' && <Backup />}
         {route.name === 'view' && <Viewer key={route.id} id={route.id} />}
       </main>
     </>

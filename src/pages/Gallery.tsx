@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { needsBackup } from '../lib/backup';
 import { listComparisons } from '../lib/db';
 import { useImageUrl } from '../lib/hooks';
 import { href } from '../lib/router';
@@ -70,6 +71,14 @@ export function Gallery() {
           + New comparison
         </a>
       </div>
+      {needsBackup(items) && (
+        <div className="notice" role="status">
+          <span>You have changes that aren’t in a backup yet. Your photos are only stored in this browser.</span>
+          <a className="btn btn--ghost" href={href.backup()}>
+            Back up now
+          </a>
+        </div>
+      )}
       {groupByRoom(items).map(([room, list]) => (
         <section key={room} className="room">
           <h2 className="room__title">{room}</h2>
