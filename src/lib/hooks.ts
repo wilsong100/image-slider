@@ -1,25 +1,29 @@
 import { useEffect, useState } from 'react';
 import { getImage } from './db';
 
-/** Loads a stored image (full size or thumbnail) and exposes it as an object URL. */
-export function useImageUrl(id: string | undefined, variant: 'blob' | 'thumb' = 'blob') {
-  const [url, setUrl] = useState<string>();
+/** Loads a stored image (full size or thumbnail) as an object URL, plus its aspect ratio. */
+export function useImage(id: string | undefined, variant: 'blob' | 'thumb' = 'blob') {
+  const [image, setImage] = useState<{ url: string; aspect: number }>();
   useEffect(() => {
     if (!id) return;
     let objectUrl: string | undefined;
     let cancelled = false;
-    getImage(id).then((image) => {
-      if (cancelled || !image) return;
-      objectUrl = URL.createObjectURL(image[variant]);
-      setUrl(objectUrl);
+    getImage(id).then((stored) => {
+      if (cancelled || !stored) return;
+      objectUrl = URL.createObjectURL(stored[variant]);
+      setImage({ url: objectUrl, aspect: stored.width / stored.height });
     });
     return () => {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
-      setUrl(undefined);
+      setImage(undefined);
     };
   }, [id, variant]);
-  return url;
+  return image;
+}
+
+export function useImageUrl(id: string | undefined, variant: 'blob' | 'thumb' = 'blob') {
+  return useImage(id, variant)?.url;
 }
 
 /** Object URL for an in-memory blob (e.g. a freshly processed upload). */

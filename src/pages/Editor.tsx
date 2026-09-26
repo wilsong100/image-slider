@@ -67,6 +67,8 @@ export function Editor({ id }: { id?: string }) {
       notes: notes.trim(),
       beforeImageId: beforeId,
       afterImageId: afterId,
+      // A new photo won't match the old alignment, so start again.
+      alignment: images.before || images.after ? undefined : existing?.alignment,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };

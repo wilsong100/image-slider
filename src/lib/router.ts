@@ -5,14 +5,17 @@ export type Route =
   | { name: 'new' }
   | { name: 'backup' }
   | { name: 'view'; id: string }
-  | { name: 'edit'; id: string };
+  | { name: 'edit'; id: string }
+  | { name: 'align'; id: string };
 
 export function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   if (parts[0] === 'new') return { name: 'new' };
   if (parts[0] === 'backup') return { name: 'backup' };
   if (parts[0] === 'c' && parts[1]) {
-    return parts[2] === 'edit' ? { name: 'edit', id: parts[1] } : { name: 'view', id: parts[1] };
+    if (parts[2] === 'edit') return { name: 'edit', id: parts[1] };
+    if (parts[2] === 'align') return { name: 'align', id: parts[1] };
+    return { name: 'view', id: parts[1] };
   }
   return { name: 'gallery' };
 }
@@ -23,6 +26,7 @@ export const href = {
   backup: () => '#/backup',
   view: (id: string) => `#/c/${encodeURIComponent(id)}`,
   edit: (id: string) => `#/c/${encodeURIComponent(id)}/edit`,
+  align: (id: string) => `#/c/${encodeURIComponent(id)}/align`,
 };
 
 export function navigate(to: string) {

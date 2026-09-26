@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { needsBackup } from '../lib/backup';
 import { listComparisons } from '../lib/db';
-import { useImageUrl } from '../lib/hooks';
+import { PhotoLayers } from '../components/PhotoLayers';
+import { useImage, useImageUrl } from '../lib/hooks';
 import { href } from '../lib/router';
 import type { Comparison } from '../lib/types';
 
@@ -15,13 +16,14 @@ export function groupByRoom(items: Comparison[]) {
 }
 
 function Card({ comparison }: { comparison: Comparison }) {
-  const before = useImageUrl(comparison.beforeImageId, 'thumb');
+  const before = useImage(comparison.beforeImageId, 'thumb');
   const after = useImageUrl(comparison.afterImageId, 'thumb');
   return (
     <a className="card" href={href.view(comparison.id)}>
       <div className="card__media">
-        {after && <img src={after} alt="" />}
-        {before && <img className="card__before" src={before} alt="" />}
+        {before && (
+          <PhotoLayers beforeSrc={before.url} afterSrc={after} aspect={before.aspect} alignment={comparison.alignment} decorative />
+        )}
         <span className="card__seam" aria-hidden="true" />
       </div>
       <div className="card__body">

@@ -79,7 +79,7 @@ type StoredImage = { id: string; blob: Blob; width: number; height: number; thum
 ### Milestone 2 — Make it great
 - [x] Rooms/groups and a room-by-room gallery
 - [ ] Full-screen viewer with swipe between comparisons
-- [ ] **Alignment editor** – nudge/zoom/rotate the after photo with a 50% opacity
+- [x] **Alignment editor** – nudge/zoom/rotate the after photo with a 50% opacity
       "onion skin" so both shots line up (see suggestions)
 - [ ] Alternate view modes: vertical slider, side-by-side, fade/opacity, tap-to-toggle
 - [ ] Notes, dates, costs per comparison

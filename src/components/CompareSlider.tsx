@@ -1,4 +1,6 @@
 import { useCallback, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import type { Alignment } from '../lib/types';
+import { PhotoLayers } from './PhotoLayers';
 
 type Props = {
   beforeSrc?: string;
@@ -6,6 +8,7 @@ type Props = {
   /** width / height of the frame; defaults to 4:3 until images load. */
   aspectRatio?: number;
   initial?: number;
+  alignment?: Alignment;
   className?: string;
 };
 
@@ -15,7 +18,7 @@ export const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.m
  * Stacks two photos in the same frame. The "before" photo sits on top and is
  * clipped to the left of the handle, so dragging right reveals more "before".
  */
-export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initial = 50, className }: Props) {
+export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initial = 50, alignment, className }: Props) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState(initial);
   const [dragging, setDragging] = useState(false);
@@ -65,10 +68,7 @@ export function CompareSlider({ beforeSrc, afterSrc, aspectRatio = 4 / 3, initia
       onPointerUp={stop}
       onPointerCancel={stop}
     >
-      {afterSrc && <img className="compare__img" src={afterSrc} alt="After" draggable={false} />}
-      {beforeSrc && (
-        <img className="compare__img compare__img--before" src={beforeSrc} alt="Before" draggable={false} />
-      )}
+      <PhotoLayers beforeSrc={beforeSrc} afterSrc={afterSrc} aspect={aspectRatio} alignment={alignment} />
       <span className="compare__label compare__label--before" data-hidden={position < 12}>
         Before
       </span>

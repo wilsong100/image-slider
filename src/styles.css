@@ -234,16 +234,31 @@ main {
   -webkit-user-select: none;
   touch-action: pan-y;
 }
-.compare__img {
+.layer {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  container-type: size;
+  pointer-events: none;
+}
+.layer--before {
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+/* The photo's own box, centred and scaled to cover the frame (like object-fit: cover),
+   so alignment offsets are relative to the photo wherever it's shown. */
+.layer__box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100cqw, calc(100cqh * var(--aspect)));
+  height: max(100cqh, calc(100cqw / var(--aspect)));
+  transform: translate(-50%, -50%);
+}
+.layer__box img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  pointer-events: none;
-}
-.compare__img--before {
-  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
 }
 .compare__divider {
   position: absolute;
@@ -354,15 +369,7 @@ main {
 .card:hover .card__media {
   --pos: 70%;
 }
-.card__media img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.card__before {
-  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+.card__media .layer--before {
   transition: clip-path 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .card__seam {
@@ -613,6 +620,159 @@ main {
 .btn.is-disabled {
   opacity: 0.45;
   pointer-events: none;
+}
+
+/* ---------- Line up ---------- */
+.align__hint {
+  max-width: 44rem;
+  margin: -12px 0 24px;
+}
+.align__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+  align-items: start;
+}
+.align__stage {
+  display: flex;
+  justify-content: center;
+}
+.align__frame {
+  position: relative;
+  width: min(100%, calc(70vh * var(--ratio)));
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-lg);
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.align__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.align__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.45) 1px, transparent 1px);
+  background-size: calc(100% / 6) calc(100% / 6);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.45);
+}
+.align__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.range {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.range__label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.range__label output {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.range input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.align__row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.align__toggles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.align__peek {
+  width: 100%;
+  padding: 0 12px;
+  white-space: normal;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+.nudge {
+  display: grid;
+  grid-template-areas: '. up .' 'left . right' '. down .';
+  grid-template-columns: repeat(3, 38px);
+  grid-template-rows: repeat(3, 38px);
+  flex: none;
+}
+.nudge__btn {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.nudge__btn:hover {
+  border-color: var(--muted);
+}
+.nudge__up { grid-area: up; }
+.nudge__left { grid-area: left; }
+.nudge__right { grid-area: right; }
+.nudge__down { grid-area: down; }
+.align__actions {
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.align__actions .btn {
+  flex: 1;
+  padding: 0 12px;
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+@media (max-width: 860px) {
+  .align__layout {
+    grid-template-columns: 1fr;
+  }
+  .align__frame {
+    width: min(100%, calc(55vh * var(--ratio)));
+  }
 }
 
 /* ---------- Viewer ---------- */
