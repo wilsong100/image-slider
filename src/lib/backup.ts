@@ -1,16 +1,29 @@
 import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from 'fflate';
-import { getComparison, getImage, listComparisons, saveComparison } from './db';
-import type { Comparison, StoredImage } from './types';
+import {
+  DEFAULT_PROJECT_NAME,
+  getComparison,
+  getImage,
+  getOrCreateProject,
+  getProject,
+  listComparisons,
+  listProjects,
+  saveComparison,
+  saveProject,
+} from './db';
+import type { Comparison, Project, StoredImage } from './types';
 
 const APP = 'then-and-now';
-const VERSION = 1;
+/** 1: comparisons only. 2: adds projects. */
+const VERSION = 2;
 const LAST_BACKUP_KEY = 'then-and-now:lastBackupAt';
 
 type BackupManifest = {
   app: typeof APP;
   version: number;
   exportedAt: string;
-  comparisons: Comparison[];
+  projects?: Project[];
+  /** Version 1 backups have no projectId. */
+  comparisons: (Omit<Comparison, 'projectId'> & { projectId?: string })[];
   images: { id: string; width: number; height: number }[];
 };
 
@@ -23,8 +36,9 @@ async function bytes(blob: Blob) {
   return new Uint8Array(await blob.arrayBuffer());
 }
 
-/** Packs every comparison and its photos into a single .zip file. */
-export async function createBackup(): Promise<{ blob: Blob; count: number }> {
+/** Packs every project, comparison and photo into a single .zip file. */
+export async function createBackup(): Promise<{ blob: Blob; count: number; projects: number }> {
+  const projects = await listProjects();
   const comparisons = await listComparisons();
   const files: Zippable = {};
   const images: BackupManifest['images'] = [];
@@ -43,6 +57,7 @@ export async function createBackup(): Promise<{ blob: Blob; count: number }> {
     app: APP,
     version: VERSION,
     exportedAt: new Date().toISOString(),
+    projects,
     comparisons,
     images,
   };
@@ -50,13 +65,18 @@ export async function createBackup(): Promise<{ blob: Blob; count: number }> {
 
   // Photos are already JPEG-compressed, so store them as-is (level 0) for speed.
   const zipped = zipSync(files, { level: 0 });
-  return { blob: new Blob([zipped as BlobPart], { type: 'application/zip' }), count: comparisons.length };
+  return {
+    blob: new Blob([zipped as BlobPart], { type: 'application/zip' }),
+    count: comparisons.length,
+    projects: projects.length,
+  };
 }
 
 /**
- * Loads a backup file. Comparisons are merged in: ones already on this device
- * (same id) are overwritten with the backed-up version, others are added, and
- * nothing that isn't in the backup is removed.
+ * Loads a backup file. Projects and comparisons are merged in: ones already on
+ * this device (same id) are overwritten with the backed-up version, others are
+ * added, and nothing that isn't in the backup is removed. Comparisons from
+ * older backups without projects go into "My home".
  */
 export async function restoreBackup(
   file: Blob,
@@ -97,12 +117,26 @@ export async function restoreBackup(
     images: [toImage(c.beforeImageId), toImage(c.afterImageId)],
   }));
 
+  const projects = Array.isArray(manifest.projects) ? manifest.projects : [];
+  for (const project of projects) {
+    // Keep whichever copy of a project was edited most recently.
+    const existing = await getProject(project.id);
+    if (!existing || existing.updatedAt <= project.updatedAt) await saveProject(project);
+  }
+  const knownProjects = new Set(projects.map((p) => p.id));
+  let fallback: Project | undefined;
+
   let added = 0;
   let updated = 0;
   for (const { comparison, images } of prepared) {
+    let projectId = comparison.projectId;
+    if (!projectId || !(knownProjects.has(projectId) || (await getProject(projectId)))) {
+      fallback ??= await getOrCreateProject(DEFAULT_PROJECT_NAME);
+      projectId = fallback.id;
+    }
     if (await getComparison(comparison.id)) updated++;
     else added++;
-    await saveComparison(comparison, images);
+    await saveComparison({ ...comparison, projectId }, images);
   }
   return { added, updated, exportedAt: Date.parse(manifest.exportedAt) || 0 };
 }
@@ -140,9 +174,9 @@ export function setLastBackupAt(time = Date.now()) {
   }
 }
 
-/** True when there is something on this device that isn't in the latest backup. */
-export function needsBackup(comparisons: Comparison[], lastBackupAt = getLastBackupAt()) {
-  if (comparisons.length === 0) return false;
+/** True when there is something on this device (comparisons or projects) that isn't in the latest backup. */
+export function needsBackup(records: { updatedAt: number }[], lastBackupAt = getLastBackupAt()) {
+  if (records.length === 0) return false;
   if (!lastBackupAt) return true;
-  return comparisons.some((c) => c.updatedAt > lastBackupAt);
+  return records.some((r) => r.updatedAt > lastBackupAt);
 }

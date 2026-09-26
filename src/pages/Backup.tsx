@@ -9,7 +9,7 @@ import {
   restoreBackup,
   setLastBackupAt,
 } from '../lib/backup';
-import { listComparisons, requestPersistentStorage } from '../lib/db';
+import { listComparisons, listProjects, requestPersistentStorage } from '../lib/db';
 import { href } from '../lib/router';
 
 type Status = { kind: 'success' | 'error'; message: string };
@@ -22,11 +22,15 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 export function Backup() {
   const inputId = useId();
   const [count, setCount] = useState<number>();
+  const [projectCount, setProjectCount] = useState<number>();
   const [lastBackupAt, setLastBackup] = useState(getLastBackupAt);
   const [working, setWorking] = useState<'download' | 'restore'>();
   const [status, setStatus] = useState<Status>();
 
-  const refresh = () => listComparisons().then((all) => setCount(all.length));
+  const refresh = () => {
+    listComparisons().then((all) => setCount(all.length));
+    listProjects().then((all) => setProjectCount(all.length));
+  };
   useEffect(() => {
     refresh();
   }, []);
@@ -54,7 +58,7 @@ export function Backup() {
       const { added, updated, exportedAt } = await restoreBackup(file);
       requestPersistentStorage();
       // If everything on this device is now covered by that backup, count it as backed up.
-      const all = await listComparisons();
+      const all = [...(await listComparisons()), ...(await listProjects())];
       if (exportedAt > (getLastBackupAt() ?? 0) && !needsBackup(all, exportedAt)) {
         setLastBackupAt(exportedAt);
         setLastBackup(exportedAt);
@@ -74,8 +78,8 @@ export function Backup() {
     <div className="page backup">
       <div className="page__head">
         <div>
-          <a className="back" href={href.gallery()}>
-            ← All comparisons
+          <a className="back" href={href.home()}>
+            ← All projects
           </a>
           <h1 className="display">Backup</h1>
         </div>
@@ -90,8 +94,11 @@ export function Backup() {
         <section className="panel">
           <h2 className="panel__title">Download a backup</h2>
           <p className="panel__text">
-            Saves {count === undefined ? 'all comparisons' : plural(count, 'comparison')} and their photos
-            as a single .zip file. Keep it somewhere safe, like Google Drive, iCloud or email.
+            Saves{' '}
+            {count === undefined || projectCount === undefined
+              ? 'all projects and comparisons'
+              : `${plural(projectCount, 'project')} and ${plural(count, 'comparison')}`}{' '}
+            with their photos as a single .zip file. Keep it somewhere safe, like Google Drive, iCloud or email.
           </p>
           <p className="panel__meta">
             {lastBackupAt ? `Last backup: ${formatDate(lastBackupAt)}` : 'No backup made on this device yet.'}
@@ -130,7 +137,7 @@ export function Backup() {
         <p className={status.kind === 'error' ? 'error' : 'success'} role={status.kind === 'error' ? 'alert' : 'status'}>
           {status.message}{' '}
           {status.kind === 'success' && working === undefined && count ? (
-            <a href={href.gallery()}>View comparisons</a>
+            <a href={href.home()}>View projects</a>
           ) : null}
         </p>
       )}

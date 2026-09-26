@@ -1,37 +1,55 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { PhotoPicker } from '../components/PhotoPicker';
-import { getComparison, listComparisons, newId, requestPersistentStorage, saveComparison } from '../lib/db';
+import {
+  getComparison,
+  listComparisons,
+  listProjects,
+  newId,
+  requestPersistentStorage,
+  saveComparison,
+} from '../lib/db';
 import { useBlobUrl, useImageUrl } from '../lib/hooks';
 import { processImage } from '../lib/image';
 import { href, navigate } from '../lib/router';
-import type { Comparison, StoredImage } from '../lib/types';
+import type { Comparison, Project, StoredImage } from '../lib/types';
 
 type Slot = 'before' | 'after';
 
-export function Editor({ id }: { id?: string }) {
+/** Create a comparison in `projectId`, or edit comparison `id`. */
+export function Editor({ id, projectId: initialProjectId }: { id?: string; projectId?: string }) {
   const [existing, setExisting] = useState<Comparison>();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectId, setProjectId] = useState(initialProjectId ?? '');
+  const [allComparisons, setAllComparisons] = useState<Comparison[]>([]);
   const [title, setTitle] = useState('');
   const [room, setRoom] = useState('');
   const [notes, setNotes] = useState('');
-  const [rooms, setRooms] = useState<string[]>([]);
   const [images, setImages] = useState<Partial<Record<Slot, StoredImage>>>({});
   const [busy, setBusy] = useState<Partial<Record<Slot, boolean>>>({});
   const [error, setError] = useState<string>();
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    listComparisons().then((all) =>
-      setRooms([...new Set(all.map((c) => c.room.trim()).filter(Boolean))].sort()),
-    );
+    listComparisons().then(setAllComparisons);
+    listProjects().then((list) => {
+      setProjects(list);
+      if (!id && !list.some((p) => p.id === initialProjectId)) navigate(href.home());
+    });
     if (!id) return;
     getComparison(id).then((c) => {
-      if (!c) return navigate(href.gallery());
+      if (!c) return navigate(href.home());
       setExisting(c);
+      setProjectId(c.projectId);
       setTitle(c.title);
       setRoom(c.room);
       setNotes(c.notes);
     });
-  }, [id]);
+  }, [id, initialProjectId]);
+
+  // Suggest rooms already used in this project.
+  const rooms = [
+    ...new Set(allComparisons.filter((c) => c.projectId === projectId).map((c) => c.room.trim()).filter(Boolean)),
+  ].sort();
 
   const storedBefore = useImageUrl(images.before ? undefined : existing?.beforeImageId, 'thumb');
   const storedAfter = useImageUrl(images.after ? undefined : existing?.afterImageId, 'thumb');
@@ -53,7 +71,8 @@ export function Editor({ id }: { id?: string }) {
 
   const beforeId = images.before?.id ?? existing?.beforeImageId;
   const afterId = images.after?.id ?? existing?.afterImageId;
-  const canSave = Boolean(beforeId && afterId && title.trim()) && !saving && !busy.before && !busy.after;
+  const canSave =
+    Boolean(beforeId && afterId && title.trim() && projectId) && !saving && !busy.before && !busy.after;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -62,6 +81,7 @@ export function Editor({ id }: { id?: string }) {
     const now = Date.now();
     const comparison: Comparison = {
       id: existing?.id ?? newId(),
+      projectId,
       title: title.trim(),
       room: room.trim(),
       notes: notes.trim(),
@@ -82,11 +102,13 @@ export function Editor({ id }: { id?: string }) {
     }
   };
 
+  const back = existing ? href.view(existing.id) : href.project(projectId);
+
   return (
     <form className="page editor" onSubmit={onSubmit}>
       <div className="page__head">
         <div>
-          <a className="back" href={existing ? href.view(existing.id) : href.gallery()}>
+          <a className="back" href={back}>
             ← Back
           </a>
           <h1 className="display">{existing ? 'Edit comparison' : 'New comparison'}</h1>
@@ -116,6 +138,18 @@ export function Editor({ id }: { id?: string }) {
             ))}
           </datalist>
         </label>
+        {projects.length > 1 && (
+          <label className="field">
+            <span className="field__label">Project</span>
+            <select value={projectId} onChange={(e) => setProjectId(e.target.value)}>
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label className="field field--wide">
           <span className="field__label">
             Notes <span className="field__optional">optional</span>
@@ -131,7 +165,7 @@ export function Editor({ id }: { id?: string }) {
       )}
 
       <div className="editor__actions">
-        <a className="btn btn--ghost" href={existing ? href.view(existing.id) : href.gallery()}>
+        <a className="btn btn--ghost" href={back}>
           Cancel
         </a>
         <button className="btn btn--primary" type="submit" disabled={!canSave}>

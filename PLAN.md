@@ -86,7 +86,7 @@ type StoredImage = { id: string; blob: Blob; width: number; height: number; thum
 - [x] Export/import a backup (zip of photos + JSON) so nothing is lost — also the migration path into cloud sync later
 
 ### Later
-- [ ] **Projects** – group comparisons by house, so several properties can live in one app
+- [x] **Projects** – group comparisons by house, so several properties can live in one app
 
 ### Milestone 3 — Share & show off
 - [ ] Cloud sync + public read-only share links

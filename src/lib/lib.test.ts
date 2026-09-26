@@ -1,12 +1,13 @@
 import { deleteComparison, getImage, listComparisons, saveComparison } from './db';
 import { fitWithin } from './image';
 import { parseRoute } from './router';
-import { groupByRoom } from '../pages/Gallery';
+import { groupByRoom } from '../pages/Project';
 import type { Comparison, StoredImage } from './types';
 
 const image = (id: string): StoredImage => ({ id, blob: new Blob(['x']), thumb: new Blob(['t']), width: 4, height: 3 });
 const comparison = (over: Partial<Comparison> = {}): Comparison => ({
   id: 'c1',
+  projectId: 'p1',
   title: 'Kitchen',
   room: 'Kitchen',
   notes: '',
@@ -29,14 +30,18 @@ describe('fitWithin', () => {
 
 describe('parseRoute', () => {
   it('maps hashes to routes', () => {
-    expect(parseRoute('')).toEqual({ name: 'gallery' });
-    expect(parseRoute('#/')).toEqual({ name: 'gallery' });
-    expect(parseRoute('#/new')).toEqual({ name: 'new' });
+    expect(parseRoute('')).toEqual({ name: 'projects' });
+    expect(parseRoute('#/')).toEqual({ name: 'projects' });
+    expect(parseRoute('#/p/new')).toEqual({ name: 'projectNew' });
+    expect(parseRoute('#/p/h1')).toEqual({ name: 'project', id: 'h1' });
+    expect(parseRoute('#/p/h1/edit')).toEqual({ name: 'projectEdit', id: 'h1' });
+    expect(parseRoute('#/p/h1/new')).toEqual({ name: 'new', projectId: 'h1' });
+    expect(parseRoute('#/new')).toEqual({ name: 'projects' });
     expect(parseRoute('#/backup')).toEqual({ name: 'backup' });
     expect(parseRoute('#/c/abc')).toEqual({ name: 'view', id: 'abc' });
     expect(parseRoute('#/c/abc/edit')).toEqual({ name: 'edit', id: 'abc' });
     expect(parseRoute('#/c/abc/align')).toEqual({ name: 'align', id: 'abc' });
-    expect(parseRoute('#/nonsense')).toEqual({ name: 'gallery' });
+    expect(parseRoute('#/nonsense')).toEqual({ name: 'projects' });
   });
 });
 

@@ -400,6 +400,61 @@ main {
   -webkit-box-orient: vertical;
 }
 
+/* ---------- Projects ---------- */
+.page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.project__notes {
+  max-width: 40rem;
+  margin: 10px 0 0;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+.grid--projects {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 26px;
+}
+.card__title--lg {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+.card__meta {
+  margin: 4px 0 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.card__media--empty {
+  display: flex;
+}
+.card__media--empty span {
+  flex: 1;
+  background: repeating-linear-gradient(135deg, var(--surface-2) 0 10px, color-mix(in srgb, var(--surface-2) 70%, var(--line)) 10px 20px);
+}
+.card__media--empty span:last-child {
+  border-left: 2px solid var(--surface);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface-2));
+}
+.display--sm {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+}
+.empty--inline {
+  padding: 40px 0 24px;
+}
+.editor__fields.editor__fields--single {
+  grid-template-columns: 1fr;
+  max-width: 40rem;
+}
+.editor__delete {
+  margin-right: auto;
+}
+.project-form .editor__actions {
+  max-width: 40rem;
+}
+
 /* ---------- Empty state ---------- */
 .empty {
   padding-top: 72px;
@@ -528,6 +583,7 @@ main {
   font-weight: 400;
 }
 .field input,
+.field select,
 .field textarea {
   width: 100%;
   padding: 12px 14px;
@@ -539,6 +595,7 @@ main {
   resize: vertical;
 }
 .field input:focus,
+.field select:focus,
 .field textarea:focus {
   outline: none;
   border-color: var(--accent);

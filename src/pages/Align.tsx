@@ -21,7 +21,7 @@ export function Align({ id }: { id: string }) {
 
   useEffect(() => {
     getComparison(id).then((c) => {
-      if (!c) return navigate(href.gallery());
+      if (!c) return navigate(href.home());
       setComparison(c);
       setAlignment(c.alignment ?? IDENTITY);
     });
