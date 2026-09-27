@@ -1,14 +1,18 @@
 import { Align } from './pages/Align';
 import { Backup } from './pages/Backup';
 import { Editor } from './pages/Editor';
+import { Export } from './pages/Export';
 import { Project } from './pages/Project';
 import { ProjectForm } from './pages/ProjectForm';
 import { Projects } from './pages/Projects';
+import { Tour } from './pages/Tour';
 import { Viewer } from './pages/Viewer';
 import { href, useRoute } from './lib/router';
 
 export function App() {
   const route = useRoute();
+  if (route.name === 'tour') return <Tour key={route.projectId} projectId={route.projectId} />;
+
   return (
     <>
       <header className="topbar">
@@ -36,6 +40,7 @@ export function App() {
         {route.name === 'backup' && <Backup />}
         {route.name === 'align' && <Align key={route.id} id={route.id} />}
         {route.name === 'view' && <Viewer key={route.id} id={route.id} />}
+        {route.name === 'export' && <Export key={route.id} id={route.id} />}
       </main>
     </>
   );

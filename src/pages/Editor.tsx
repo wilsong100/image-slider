@@ -24,6 +24,9 @@ export function Editor({ id, projectId: initialProjectId }: { id?: string; proje
   const [title, setTitle] = useState('');
   const [room, setRoom] = useState('');
   const [notes, setNotes] = useState('');
+  const [dates, setDates] = useState<Partial<Record<Slot, string>>>({});
+  // Which dates were filled in automatically from the photo.
+  const [autoDates, setAutoDates] = useState<Partial<Record<Slot, boolean>>>({});
   const [images, setImages] = useState<Partial<Record<Slot, StoredImage>>>({});
   const [busy, setBusy] = useState<Partial<Record<Slot, boolean>>>({});
   const [error, setError] = useState<string>();
@@ -43,6 +46,7 @@ export function Editor({ id, projectId: initialProjectId }: { id?: string; proje
       setTitle(c.title);
       setRoom(c.room);
       setNotes(c.notes);
+      setDates({ before: c.beforeDate, after: c.afterDate });
     });
   }, [id, initialProjectId]);
 
@@ -60,8 +64,11 @@ export function Editor({ id, projectId: initialProjectId }: { id?: string; proje
     setError(undefined);
     setBusy((b) => ({ ...b, [slot]: true }));
     try {
-      const image = await processImage(file);
+      const { image, takenAt } = await processImage(file);
       setImages((prev) => ({ ...prev, [slot]: image }));
+      // The old date belonged to the old photo, so clear it if the new one has none.
+      setDates((d) => ({ ...d, [slot]: takenAt ?? '' }));
+      setAutoDates((a) => ({ ...a, [slot]: Boolean(takenAt) }));
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -89,6 +96,8 @@ export function Editor({ id, projectId: initialProjectId }: { id?: string; proje
       afterImageId: afterId,
       // A new photo won't match the old alignment, so start again.
       alignment: images.before || images.after ? undefined : existing?.alignment,
+      beforeDate: dates.before || undefined,
+      afterDate: dates.after || undefined,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };
@@ -138,6 +147,23 @@ export function Editor({ id, projectId: initialProjectId }: { id?: string; proje
             ))}
           </datalist>
         </label>
+        {(['before', 'after'] as const).map((slot) => (
+          <label className="field" key={slot}>
+            <span className="field__label">
+              {slot === 'before' ? 'Before' : 'After'} photo taken{' '}
+              <span className="field__optional">{autoDates[slot] ? 'from the photo' : 'optional'}</span>
+            </span>
+            <input
+              type="date"
+              value={dates[slot] ?? ''}
+              max={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => {
+                setDates((d) => ({ ...d, [slot]: e.target.value }));
+                setAutoDates((a) => ({ ...a, [slot]: false }));
+              }}
+            />
+          </label>
+        ))}
         {projects.length > 1 && (
           <label className="field">
             <span className="field__label">Project</span>

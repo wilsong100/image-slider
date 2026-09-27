@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { PhotoLayers } from '../components/PhotoLayers';
 import { getProject, listComparisons } from '../lib/db';
+import { formatMonthYear } from '../lib/dates';
 import { useImage, useImageUrl } from '../lib/hooks';
 import { href, navigate } from '../lib/router';
+import { startTour } from './Tour';
 import type { Comparison, Project as ProjectType } from '../lib/types';
 
 export function groupByRoom(items: Comparison[]) {
@@ -36,6 +38,11 @@ function Card({ comparison }: { comparison: Comparison }) {
       <SplitPreview comparison={comparison} />
       <div className="card__body">
         <h3 className="card__title">{comparison.title || 'Untitled'}</h3>
+        {(comparison.beforeDate || comparison.afterDate) && (
+          <p className="card__meta">
+            {formatMonthYear(comparison.beforeDate) || '?'} → {formatMonthYear(comparison.afterDate) || '?'}
+          </p>
+        )}
         {comparison.notes && <p className="card__notes">{comparison.notes}</p>}
       </div>
     </a>
@@ -71,6 +78,11 @@ export function Project({ id }: { id: string }) {
           <a className="btn btn--ghost" href={href.projectEdit(project.id)}>
             Edit project
           </a>
+          {items.length > 0 && (
+            <button type="button" className="btn btn--ghost" onClick={() => startTour(project.id)}>
+              ▶ Tour
+            </button>
+          )}
           {items.length > 0 && (
             <a className="btn btn--primary" href={href.new(project.id)}>
               + New comparison

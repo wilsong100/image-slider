@@ -1,4 +1,5 @@
 import { newId } from './db';
+import { readPhotoDate } from './exif';
 import type { StoredImage } from './types';
 
 export const FULL_MAX = 2560;
@@ -29,9 +30,11 @@ async function encode(bitmap: ImageBitmap, max: number, quality: number) {
 /**
  * Decodes a photo (respecting the phone's rotation info), shrinks it to a
  * sensible size, and produces a small thumbnail for the gallery. Re-encoding
- * also strips EXIF metadata such as GPS location.
+ * also strips EXIF metadata such as GPS location, so the date the photo was
+ * taken is read first and returned separately.
  */
-export async function processImage(file: File): Promise<StoredImage> {
+export async function processImage(file: File): Promise<{ image: StoredImage; takenAt?: string }> {
+  const takenAt = await readPhotoDate(file);
   let bitmap: ImageBitmap;
   try {
     bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
@@ -46,7 +49,10 @@ export async function processImage(file: File): Promise<StoredImage> {
   try {
     const full = await encode(bitmap, FULL_MAX, 0.88);
     const thumb = await encode(bitmap, THUMB_MAX, 0.8);
-    return { id: newId(), blob: full.blob, thumb: thumb.blob, width: full.width, height: full.height };
+    return {
+      image: { id: newId(), blob: full.blob, thumb: thumb.blob, width: full.width, height: full.height },
+      takenAt,
+    };
   } finally {
     bitmap.close();
   }
